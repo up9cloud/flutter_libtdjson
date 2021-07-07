@@ -9,8 +9,8 @@ Demonstrates how to use the libtdjson plugin.
 
     ```json
     {
-        "telegram_app_id": 123456,
-        "telegram_app_hash": "xxxxxx"
+        "telegram_api_id": 123456,
+        "telegram_api_hash": "xxxxxx"
     }
     ```
 

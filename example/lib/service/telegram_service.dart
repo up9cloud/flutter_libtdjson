@@ -31,8 +31,8 @@ class TelegramService extends ChangeNotifier {
       start: false,
       newVerbosityLevel: 3,
       tdlibParameters: {
-        'api_id': GlobalConfiguration().getValue<int>("telegram_app_id"),
-        'api_hash': GlobalConfiguration().getValue<String>("telegram_app_hash"),
+        'api_id': GlobalConfiguration().getValue<int>("telegram_api_id"),
+        'api_hash': GlobalConfiguration().getValue<String>("telegram_api_hash"),
         'device_model': 'Unknown',
         'database_directory': appDir.path,
         'files_directory': tempDir.path,

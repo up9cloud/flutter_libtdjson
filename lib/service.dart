@@ -88,7 +88,7 @@ class Service {
     this.tdlibParameters = tdlibParameters;
     if (maxExtra < 10000) {
       throw ArgumentError(
-          "For preventing infinity generating extra issue, don't set maxExtra less than 10000");
+          "For preventing infinity generating extra, don't set maxExtra less than 10000");
     }
     _dir = dir;
     _file = file;
@@ -116,6 +116,7 @@ class Service {
     }
   }
 
+  /// Start receiving messages from native td json client
   Future<void> start() async {
     if (_running) {
       return;
@@ -135,6 +136,7 @@ class Service {
     _receivePort!.listen(_onIsolateReceive, onError: _onReceiveError);
   }
 
+  /// Stop receiving messaages from native td json client
   Future<void> stop() async {
     if (!_running) {
       return;
@@ -268,9 +270,9 @@ class Service {
     return Future.value();
   }
 
-  /// Synchronously send td function (wait until get the result)
-  /// This is handled by this service (dart side), not native td execute api
-  /// Because td client don't allow some functions executing synchronously
+  /// Synchronously send td function (it will wait until get the result)
+  /// This is handled by dart side service, not by native td execute function
+  /// Because td client doesn't allow some functions executing synchronously
   Future<Map<String, dynamic>> sendSync(Map<String, dynamic> obj) {
     int extra;
     if (obj.containsKey('@extra')) {
@@ -289,7 +291,7 @@ class Service {
   }
 
   /// Synchronously execute td function
-  /// Handled by native td execute api
+  /// Handled by native td execute function
   Future<Map<String, dynamic>> execute(Map<String, dynamic> obj) async {
     if (beforeExecute != null) {
       beforeExecute!(obj);

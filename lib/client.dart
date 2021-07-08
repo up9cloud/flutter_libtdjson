@@ -9,16 +9,28 @@ import "package:path/path.dart" as path;
 import './typedef.dart' as def;
 import './typedef_dart.dart' as defDart;
 
+/// FFI binding functions, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
+/// All method names same as c symbols
 class NativeClient {
+  /// dynamic lib handler
   late final DynamicLibrary libtdjson;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_create td_json_client_create;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_send td_json_client_send;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_receive td_json_client_receive;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_execute td_json_client_execute;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_destroy td_json_client_destroy;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_create_client_id td_create_client_id;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_send td_send;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_receive td_receive;
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_execute td_execute;
 
   NativeClient({String? dir, String? file}) {
@@ -77,12 +89,16 @@ class NativeClient {
   }
 }
 
+/// Handle ffi types to let functions more dartful:
+/// ffi.Pointer <---> int (pointer.address)
+/// Pointer<Utf8> <---> String
 class RawClient {
   late final NativeClient _nativeClient;
 
   RawClient({String? dir, String? file}) {
     _nativeClient = NativeClient(dir: dir, file: file);
   }
+
   int td_json_client_create() {
     return _nativeClient.td_json_client_create().address;
   }
@@ -92,10 +108,10 @@ class RawClient {
         Pointer.fromAddress(clientId), request.toNativeUtf8());
   }
 
+  /// If timed out, native client would return nullptr (0x0), and the function `.toDartString` of ffi package doesn't allow nullptr, so here returns empty string ("")
   String td_json_client_receive(int clientId, double timeout) {
     Pointer<Utf8> raw = _nativeClient.td_json_client_receive(
         Pointer.fromAddress(clientId), timeout);
-    // If timed out, it would return nullptr, and dart .toDartString doesn't allow nullptr, so
     if (raw.address == nullptr.address) {
       return "";
     }
@@ -120,6 +136,7 @@ class RawClient {
     _nativeClient.td_send(clientId, request.toNativeUtf8());
   }
 
+  /// It will return empty string ("") if timeout
   String td_receive(double timeout) {
     Pointer<Utf8> raw = _nativeClient.td_receive(timeout);
     if (raw.address == nullptr.address) {
@@ -142,7 +159,8 @@ class Client {
     _rawClient = RawClient(dir: dir, file: file);
   }
 
-  /// Create native client instance, have to call it at least once before using other methods
+  /// Call native function to create native client instance.
+  /// You have to call it at least once before using other methods
   void create() {
     clientId = _rawClient.td_json_client_create();
   }
@@ -163,7 +181,7 @@ class Client {
     _rawClient.td_json_client_send(clientId!, json.encode(obj));
   }
 
-  /// Encode json object, send it to td json client, and then response the decoded json result
+  /// Encode json object, send it to td json client, and then decode the result to json object
   Map<String, dynamic> execute(Map<String, dynamic> obj) {
     String s = _rawClient.td_json_client_execute(clientId!, json.encode(obj));
     return json.decode(s);

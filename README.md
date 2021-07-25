@@ -2,7 +2,9 @@
 
 A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-from-other-programming-languages), ffi binding.
 
-- Make sure you are using supported one
+## Supported architectures
+
+Make sure you are using supported one
 
 | Platform         | Architecture |     |
 | ---------------- | ------------ | --- |

@@ -18,10 +18,8 @@ jobs:
           skipTests: true
           flutter: true
       - id: set_status
-        env:
-          FLUTTER_PUBLISH_STATUS: ${{ steps.flutter_publish.outputs.success }}
         run: |
-          if [ "$FLUTTER_PUBLISH_STATUS" = "true" ]; then
+          if [ "${{steps.flutter_publish.outputs.success}}" = "true" ]; then
             echo "::set-output name=status::success"
           else
             echo "::set-output name=status::failure"

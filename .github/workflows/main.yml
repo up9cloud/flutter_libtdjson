@@ -11,12 +11,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: k-paxian/dart-package-publisher@v1.3
+        id: flutter_publish
         with:
           accessToken: ${{ secrets.FLUTTER_PUB_ACCESS_TOKEN }}
           refreshToken: ${{ secrets.FLUTTER_PUB_REFRESH_TOKEN }}
+          skipTests: true
+          flutter: true
+      - id: set_status
+        env:
+          FLUTTER_PUBLISH_STATUS: ${{ steps.flutter_publish.outputs.success }}
+        run: |
+          if [ "$FLUTTER_PUBLISH_STATUS" = "true" ]; then
+            echo "::set-output name=status::success"
+          else
+            echo "::set-output name=status::failure"
+          fi
       - uses: up9cloud/action-notify@master
         if: cancelled() == false
         env:
-          GITHUB_JOB_STATUS: ${{ job.status }}
+          GITHUB_JOB_STATUS: ${{ steps.set_status.outputs.status }}
           TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
           TELEGRAM_CHAT_ID: ${{secrets.TELEGRAM_CHAT_ID}}

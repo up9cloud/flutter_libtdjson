@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io' show Directory;
+import 'dart:io' show Directory, Platform;
 
 import 'package:flutter/material.dart' show ChangeNotifier, Navigator;
 import 'package:global_configuration/global_configuration.dart';
@@ -23,14 +23,17 @@ class TelegramService extends ChangeNotifier {
   _init() async {
     Directory appDir = await getApplicationDocumentsDirectory();
     Directory tempDir = await getTemporaryDirectory();
-    PermissionStatus perm = await Permission.storage.request();
-    if (!perm.isGranted) {
-      _log('Permission.storage.request(): $perm');
+    if (Platform.isAndroid || Platform.isIOS) {
+      PermissionStatus perm = await Permission.storage.request();
+      if (!perm.isGranted) {
+        _log('Permission.storage.request(): $perm');
+      }
     }
     _service = Service(
       start: false,
-      newVerbosityLevel: 3,
+      // newVerbosityLevel: 3,
       tdlibParameters: {
+        // 'use_test_dc': true,
         'api_id': GlobalConfiguration().getValue<int>("telegram_api_id"),
         'api_hash': GlobalConfiguration().getValue<String>("telegram_api_hash"),
         'device_model': 'Unknown',

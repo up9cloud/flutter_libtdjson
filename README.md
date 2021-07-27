@@ -1,5 +1,7 @@
 # flutter_libtdjson
 
+[![pub package](https://img.shields.io/pub/v/libtdjson.svg)](https://pub.dev/packages/libtdjson) [![pub points](https://badges.bar/libtdjson/pub%20points)](https://pub.dev/packages/libtdjson/score) [![popularity](https://badges.bar/libtdjson/popularity)](https://pub.dev/packages/libtdjson/score) [![likes](https://badges.bar/libtdjson/likes)](https://pub.dev/packages/libtdjson/score)
+
 A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-from-other-programming-languages), ffi binding.
 
 ## Supported architectures

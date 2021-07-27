@@ -160,8 +160,11 @@ class Client {
   }
 
   /// Call native function to create native client instance.
-  /// You have to call it at least once before using other methods
+  /// Have to call it at least once before using other methods
   void create() {
+    if (clientId != null) {
+      _rawClient.td_json_client_destroy(clientId!);
+    }
     clientId = _rawClient.td_json_client_create();
   }
 

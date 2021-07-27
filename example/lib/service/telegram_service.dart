@@ -31,7 +31,7 @@ class TelegramService extends ChangeNotifier {
     }
     _service = Service(
       start: false,
-      // newVerbosityLevel: 3,
+      newVerbosityLevel: 3,
       tdlibParameters: {
         // 'use_test_dc': true,
         'api_id': GlobalConfiguration().getValue<int>("telegram_api_id"),
@@ -82,9 +82,10 @@ class TelegramService extends ChangeNotifier {
     switch (state['@type']) {
       case 'authorizationStateWaitTdlibParameters':
       case 'authorizationStateWaitEncryptionKey':
-      case 'authorizationStateClosed':
-        route = Navigator.defaultRouteName;
-        break;
+      case 'authorizationStateWaitPassword':
+      case 'authorizationStateWaitOtherDeviceConfirmation':
+      case 'authorizationStateWaitRegistration':
+        return;
       case 'authorizationStateWaitPhoneNumber':
         route = NavigationService.LOGIN;
         break;
@@ -94,12 +95,12 @@ class TelegramService extends ChangeNotifier {
       case 'authorizationStateReady':
         route = NavigationService.END;
         break;
-      case 'authorizationStateWaitPassword':
-      case 'authorizationStateWaitOtherDeviceConfirmation':
-      case 'authorizationStateWaitRegistration':
       case 'authorizationStateLoggingOut':
       case 'authorizationStateClosing':
         return;
+      case 'authorizationStateClosed':
+        route = Navigator.defaultRouteName;
+        break;
       default:
         return;
     }

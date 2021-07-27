@@ -13,7 +13,7 @@ class Service {
   late Client _client;
   Map _callbacks = <int, Completer>{};
 
-  /// timeout (second) for td receive, for the event loop of `receive` stream
+  /// Timeout (second) for event loop of `receive` stream. (td receive)
   late double timeout;
 
   /// The maximun random value (0 ~ max) for td function @extra
@@ -88,7 +88,7 @@ class Service {
     this.tdlibParameters = tdlibParameters;
     if (maxExtra < 10000) {
       throw ArgumentError(
-          "For preventing infinity generating extra, don't set maxExtra less than 10000");
+          "To prevent infinity generating @extra, don't set maxExtra less than 10000");
     }
     _dir = dir;
     _file = file;
@@ -99,6 +99,7 @@ class Service {
   }
 
   bool _running = false;
+  bool _isLoggedOut = false;
   bool get isRunning => _running;
   Isolate? _receiveIsolate;
   ReceivePort? _receivePort;
@@ -121,30 +122,37 @@ class Service {
     if (_running) {
       return;
     }
-    if (_client.clientId == null) {
+    if (_client.clientId == null || _isLoggedOut) {
       _client.create();
       send({
         "@type": "setLogVerbosityLevel",
         "new_verbosity_level": newVerbosityLevel
       });
+      _isLoggedOut = false;
     }
-    _running = true;
     _receivePort = ReceivePort();
     _receiveIsolate = await Isolate.spawn(_receive,
         [_receivePort!.sendPort, _dir, _file, _client.clientId, timeout],
         debugName: "isolated receive");
     _receivePort!.listen(_onIsolateReceive, onError: _onReceiveError);
+    _running = true;
   }
 
-  /// Stop receiving messaages from native td json client
-  Future<void> stop() async {
-    if (!_running) {
-      return;
-    }
+  Future<void> _killIsolate() async {
     _receivePort?.close();
     _receivePort = null;
     _receiveIsolate?.kill(priority: Isolate.immediate);
     _receiveIsolate = null;
+  }
+
+  /// Stop receiving messaages from native td json client, use this wisely
+  Future<void> stop() async {
+    if (!_running) {
+      return;
+    }
+    await _killIsolate();
+    // Need to wait native client finish last loop to prevent the error: [Client.cpp:277] Receive is called after Client destroy, or simultaneously from different threads
+    await Future.delayed(Duration(seconds: timeout.round()));
     _running = false;
   }
 
@@ -157,14 +165,14 @@ class Service {
     _onReceive(j);
   }
 
-  void _onReceive(Map<String, dynamic> obj) {
-    if (afterReceive != null) {
-      afterReceive!(obj);
-    }
+  void _onReceive(Map<String, dynamic> obj) async {
     if (obj['@type'] == 'error') {
       _handleError(Error.fromJson(obj));
     } else {
-      _handleObject(obj);
+      await _handleObject(obj);
+    }
+    if (afterReceive != null) {
+      afterReceive!(obj);
     }
   }
 
@@ -174,11 +182,11 @@ class Service {
     }
   }
 
-  _handleObject(Map<String, dynamic> obj) async {
+  Future _handleObject(Map<String, dynamic> obj) async {
     if (obj['@type'] == "updates") {
       (obj['updates'] ?? []).map((update) => _handleEvent(update));
     } else {
-      _handleEvent(obj);
+      await _handleEvent(obj);
     }
     if (obj.containsKey('@extra')) {
       final int extra = obj['@extra'];
@@ -229,12 +237,10 @@ class Service {
           });
         }
         break;
-      // TODO: block methods calling until closed.
-      // case 'authorizationStateLoggingOut':
-      // To prevent someone send {"@type": "logOut"} to destory native client
+      // To prevent someone send {"@type": "logOut"}
       case 'authorizationStateClosed':
+        _isLoggedOut = true;
         await stop();
-        _client.create();
         break;
     }
   }

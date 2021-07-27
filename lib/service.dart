@@ -112,8 +112,10 @@ class Service {
     final double timeout = args[4];
     RawClient _rawClient = RawClient(dir: dir, file: file);
     while (true) {
-      String s = _rawClient.td_json_client_receive(clientId, timeout);
-      sendPortToMain.send(s);
+      String? s = _rawClient.td_json_client_receive(clientId, timeout);
+      if (s != null) {
+        sendPortToMain.send(s);
+      }
     }
   }
 
@@ -158,9 +160,6 @@ class Service {
 
   void _onIsolateReceive(dynamic data) {
     String s = data;
-    if (s.isEmpty) {
-      return;
-    }
     Map<String, dynamic> j = json.decode(s);
     _onReceive(j);
   }

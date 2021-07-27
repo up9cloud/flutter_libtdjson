@@ -18,12 +18,14 @@ class _State extends State<LogoutPage> {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-          child: Column(
-        children: <Widget>[
-          Text('End page, route: ${ModalRoute.of(context)?.settings.name}'),
-          Text(_errorText ?? ""),
-        ],
-      )),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('End page, route: ${ModalRoute.of(context)?.settings.name}'),
+            Text(_errorText ?? ""),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _next(),
         label: const Text('Logout'),

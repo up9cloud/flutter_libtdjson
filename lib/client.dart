@@ -14,22 +14,31 @@ import './typedef_dart.dart' as defDart;
 class NativeClient {
   /// dynamic lib handler
   late final DynamicLibrary libtdjson;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_create td_json_client_create;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_send td_json_client_send;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_receive td_json_client_receive;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_execute td_json_client_execute;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_destroy td_json_client_destroy;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_create_client_id td_create_client_id;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_send td_send;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_receive td_receive;
+
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_execute td_execute;
 
@@ -90,8 +99,8 @@ class NativeClient {
 }
 
 /// Handle ffi types to let functions more dartful:
-/// ffi.Pointer <---> int (pointer.address)
-/// Pointer<Utf8> <---> String
+/// client: Pointer <---> int (pointer.address)
+/// received result: Pointer<Utf8> <---> String?
 class RawClient {
   late final NativeClient _nativeClient;
 
@@ -108,12 +117,13 @@ class RawClient {
         Pointer.fromAddress(clientId), request.toNativeUtf8());
   }
 
-  /// If timed out, native client would return nullptr (0x0), and the function `.toDartString` of ffi package doesn't allow nullptr, so here returns empty string ("")
-  String td_json_client_receive(int clientId, double timeout) {
+  /// It will return null if timed out
+  String? td_json_client_receive(int clientId, double timeout) {
     Pointer<Utf8> raw = _nativeClient.td_json_client_receive(
         Pointer.fromAddress(clientId), timeout);
+    // Native client may return nullptr (0x0)
     if (raw.address == nullptr.address) {
-      return "";
+      return null;
     }
     return raw.toDartString();
   }
@@ -136,11 +146,11 @@ class RawClient {
     _nativeClient.td_send(clientId, request.toNativeUtf8());
   }
 
-  /// It will return empty string ("") if timeout
-  String td_receive(double timeout) {
+  /// It will return null if timed out
+  String? td_receive(double timeout) {
     Pointer<Utf8> raw = _nativeClient.td_receive(timeout);
     if (raw.address == nullptr.address) {
-      return "";
+      return null;
     }
     return raw.toDartString();
   }
@@ -171,8 +181,8 @@ class Client {
   /// Call td json receive, convert result to json object
   /// It will response null if receive empty string (timeout)
   Map<String, dynamic>? receive([double timeout = 10]) {
-    String s = _rawClient.td_json_client_receive(clientId!, timeout);
-    if (s.isEmpty) {
+    String? s = _rawClient.td_json_client_receive(clientId!, timeout);
+    if (s == null) {
       return null;
     }
     Map<String, dynamic> j = json.decode(s);

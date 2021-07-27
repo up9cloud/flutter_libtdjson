@@ -18,7 +18,8 @@ Make sure you are using supported one
 | iOS simulator    | i386         | ❌   |
 |                  | x86_64       | ✅   |
 |                  | arm64 (M1)   | ❌   |
-| macOS            | x86_64       | ✅   |
+| macOS            | i386         | ❌   |
+|                  | x86_64       | ✅   |
 |                  | arm64 (M1)   | ❌   |
 
 ## Install

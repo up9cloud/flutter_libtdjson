@@ -37,9 +37,13 @@ class _State extends State<HomePage> {
                 _loading = false;
               });
             },
-            label: Container(child: Text(isRunning ? 'Stop receiving' : 'Start receiving'), margin: EdgeInsets.only(right: 10)),
+            label: Container(
+                child: Text(isRunning ? 'Stop receiving' : 'Start receiving'),
+                margin: EdgeInsets.only(right: 10)),
             icon: Container(
-              child: _loading ? CircularProgressIndicator(strokeWidth: 2.0) : Icon(Icons.navigate_next, size: 15.0),
+              child: _loading
+                  ? CircularProgressIndicator(strokeWidth: 2.0)
+                  : Icon(Icons.navigate_next, size: 15.0),
               margin: EdgeInsets.only(left: 10),
               height: 15.0,
               width: 15.0,

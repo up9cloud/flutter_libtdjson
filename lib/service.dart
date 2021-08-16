@@ -183,7 +183,7 @@ class Service {
 
   Future _handleObject(Map<String, dynamic> obj) async {
     if (obj['@type'] == "updates") {
-      (obj['updates'] ?? []).map((update) => _handleEvent(update));
+      await Future.wait((obj['updates'] ?? []).map((update) => _handleEvent(update)));
     } else {
       await _handleEvent(obj);
     }
@@ -197,15 +197,16 @@ class Service {
   }
 
   _handleError(Error e) {
-    if (onReceiveError != null) {
-      onReceiveError!(e);
-    }
     if (e.extra != null) {
       final int extra = e.extra;
       if (_callbacks.containsKey(extra)) {
         Completer fut = _callbacks.remove(extra);
         fut.completeError(e);
+        return;
       }
+    }
+    if (onReceiveError != null) {
+      onReceiveError!(e);
     }
   }
 

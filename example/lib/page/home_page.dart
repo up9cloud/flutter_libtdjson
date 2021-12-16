@@ -56,6 +56,7 @@ class _State extends State<HomePage> {
             GetIt.I<NavigationService>().goTo(NavigationService.LOGIN),
         label: const Text('Login page'),
         icon: const Icon(Icons.navigate_next),
+        backgroundColor: isRunning ? Colors.cyanAccent : Colors.grey,
       ),
     );
   }

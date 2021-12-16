@@ -4,6 +4,13 @@
 
 A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-from-other-programming-languages), ffi binding.
 
+## Lib versions
+
+| package | td                            |
+| ------- | ----------------------------- |
+| 0.1.3   | 1.7.9                         |
+| 0.1.2   | 1.7.0 (Android), latest (iOS) |
+
 ## Supported architectures
 
 Make sure you are using supported one
@@ -22,15 +29,15 @@ Make sure you are using supported one
 |                  | arm64 (M1)   | ❌   |
 | macOS            | i386         | ❌   |
 |                  | x86_64       | ✅   |
-|                  | arm64 (M1)   | ❌   |
+|                  | arm64 (M1)   | ✅   |
 
-## Install
+## Installation
 
 - Update `pubspec.yaml`:
 
   ```yml
   dependencies:
-    libtdjson: ^0.1.0
+    libtdjson: ^0.1.3
   ```
 
 - If you want to build android, you have to add envs for github maven, see `./android/build.gradle`
@@ -57,3 +64,17 @@ Make sure you are using supported one
       <true/>
   </dict>
   ```
+
+## Dev memo
+
+> Bump tdlib version
+
+- Bump the td version of [android-libtdjson](https://github.com/up9cloud/android-libtdjson)
+- Bump the td version of [ios-libtdjson](https://github.com/up9cloud/ios-libtdjson)
+- Bump the android dependency version in `./android/app/build.gradle`
+- Bump the ios dependency version in `./ios/libtdjson.podspec`
+- Bump the macos dependency version in `./macos/libtdjson.podspec`
+- Run `./example` for ios, android, macos
+- Bump the package version in `./pubspec.yaml`
+- Bump version info in `./README.md`
+- Commit and push

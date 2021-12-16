@@ -1,10 +1,10 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_libtdjson (0.2.0)
+  - flutter_libtdjson (0.2.1)
   - libtdjson (0.0.1):
     - Flutter
-    - flutter_libtdjson
-  - path_provider (0.0.1):
+    - flutter_libtdjson (= 0.2.1)
+  - path_provider_ios (0.0.1):
     - Flutter
   - "permission_handler (5.1.0+2)":
     - Flutter
@@ -12,7 +12,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - libtdjson (from `.symlinks/plugins/libtdjson/ios`)
-  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
 
 SPEC REPOS:
@@ -24,18 +24,18 @@ EXTERNAL SOURCES:
     :path: Flutter
   libtdjson:
     :path: ".symlinks/plugins/libtdjson/ios"
-  path_provider:
-    :path: ".symlinks/plugins/path_provider/ios"
+  path_provider_ios:
+    :path: ".symlinks/plugins/path_provider_ios/ios"
   permission_handler:
     :path: ".symlinks/plugins/permission_handler/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  flutter_libtdjson: a79e7a0aff7ac95080ed473eb077f9a58c422136
-  libtdjson: 69e5721af890d1c9f68920e2921f844194829636
-  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  flutter_libtdjson: feb4036eee6f6930aa42a75d624eeac7fb4221d9
+  libtdjson: 59f52c13b0a7331b4792dee5e332c2eb56b07504
+  path_provider_ios: 7d7ce634493af4477d156294792024ec3485acd5
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
 
 PODFILE CHECKSUM: 8e679eca47255a8ca8067c4c67aab20e64cb974d
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.2

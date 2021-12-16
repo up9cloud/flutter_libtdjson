@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.3
+
+* Bump the TD Lib version to v1.7.9
+
 ## 0.1.2
 
 * Don't sent error to error handler if there is callback, prevent getting same error twice.

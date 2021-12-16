@@ -41,5 +41,5 @@ android {
 }
 
 dependencies {
-    implementation "io.github.up9cloud:td:1.7.0"
+    implementation "io.github.up9cloud:td:1.7.9"
 }

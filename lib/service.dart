@@ -183,7 +183,8 @@ class Service {
 
   Future _handleObject(Map<String, dynamic> obj) async {
     if (obj['@type'] == "updates") {
-      await Future.wait((obj['updates'] ?? []).map((update) => _handleEvent(update)));
+      await Future.wait(
+          (obj['updates'] ?? []).map((update) => _handleEvent(update)));
     } else {
       await _handleEvent(obj);
     }

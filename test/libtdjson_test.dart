@@ -5,9 +5,7 @@ import 'package:libtdjson/libtdjson.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-  });
+  setUp(() {});
 
-  tearDown(() {
-  });
+  tearDown(() {});
 }

@@ -6,10 +6,10 @@ A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-fr
 
 ## Lib versions
 
-| package | td                            |
-| ------- | ----------------------------- |
-| 0.1.3   | 1.7.9                         |
-| 0.1.2   | 1.7.0 (Android), latest (iOS) |
+| package | td                                   |
+| ------- | ------------------------------------ |
+| 0.1.3   | 1.7.9 (Android, iOS, macOS)          |
+| 0.1.2   | 1.7.0 (Android), latest (iOS, macOS) |
 
 ## Supported architectures
 

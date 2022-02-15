@@ -98,6 +98,8 @@ class Service {
     }
   }
 
+  bool _starting = false;
+  bool _stopping = false;
   bool _running = false;
   bool _isLoggedOut = false;
   bool get isRunning => _running;
@@ -113,17 +115,38 @@ class Service {
     RawClient _rawClient = RawClient(dir: dir, file: file);
     while (true) {
       String? s = _rawClient.td_json_client_receive(clientId, timeout);
-      if (s != null) {
-        sendPortToMain.send(s);
+      if (s == null) {
+        continue;
       }
+      if (s == '{"@type":"testInt","value":1}') {
+        sendPortToMain.send(true);
+        break;
+      }
+      sendPortToMain.send(s);
     }
+  }
+
+  Future<void> _initIsolate() async {
+    _receivePort = ReceivePort();
+    _receivePort!.listen(_onIsolateReceive, onError: _onReceiveError);
+    _receiveIsolate = await Isolate.spawn(_receive,
+        [_receivePort!.sendPort, _dir, _file, _client.clientId, timeout],
+        debugName: "isolated receive");
+  }
+
+  _killIsolate() {
+    _receiveIsolate?.kill(priority: Isolate.immediate);
+    _receiveIsolate = null;
+    _receivePort?.close();
+    _receivePort = null;
   }
 
   /// Start receiving messages from native td json client
   Future<void> start() async {
-    if (_running) {
+    if (_starting || _running) {
       return;
     }
+    _starting = true;
     if (_client.clientId == null || _isLoggedOut) {
       _client.create();
       send({
@@ -132,33 +155,38 @@ class Service {
       });
       _isLoggedOut = false;
     }
-    _receivePort = ReceivePort();
-    _receiveIsolate = await Isolate.spawn(_receive,
-        [_receivePort!.sendPort, _dir, _file, _client.clientId, timeout],
-        debugName: "isolated receive");
-    _receivePort!.listen(_onIsolateReceive, onError: _onReceiveError);
+    await _initIsolate();
+    _starting = false;
     _running = true;
-  }
-
-  Future<void> _killIsolate() async {
-    _receivePort?.close();
-    _receivePort = null;
-    _receiveIsolate?.kill(priority: Isolate.immediate);
-    _receiveIsolate = null;
   }
 
   /// Stop receiving messaages from native td json client, use this wisely
   Future<void> stop() async {
-    if (!_running) {
+    if (_stopping || !_running) {
       return;
     }
-    await _killIsolate();
-    // Need to wait native client finish last loop to prevent the error: [Client.cpp:277] Receive is called after Client destroy, or simultaneously from different threads
-    await Future.delayed(Duration(seconds: timeout.round()));
-    _running = false;
+    _stopping = true;
+    // Need to wait isolate finishing last receive loop to prevent the error: [Client.cpp:277] Receive is called after Client destroy, or simultaneously from different threads
+    // Flows:
+    // - send custom event to td native
+    // - isolate receive the event
+    // - isolate send spectial type to main
+    // - isolate break the loop
+    // - main receive the type
+    // - kill isolate
+    _client.send({
+      "@type": "testSquareInt",
+      "x": 1
+    });
   }
 
   void _onIsolateReceive(dynamic data) {
+    if (data is bool) {
+      _killIsolate();
+      _stopping = false;
+      _running = false;
+      return;
+    }
     String s = data;
     Map<String, dynamic> j = json.decode(s);
     _onReceive(j);
@@ -260,7 +288,7 @@ class Service {
 
   /// Asynchronously send td function
   Future send(Map<String, dynamic> obj) async {
-    // it's not neccecery adding @extra for send, but helpful for debug
+    // Because we're using `testSquareInt` as a flow signal, it's neccecery adding @extra to distinguish where the event from.
     int extra;
     if (obj.containsKey('@extra')) {
       extra = obj['@extra'];

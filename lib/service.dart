@@ -99,9 +99,8 @@ class Service {
   }
 
   bool _starting = false;
-  bool _stopping = false;
+  Completer? _stopping;
   bool _running = false;
-  bool _isLoggedOut = false;
   bool get isRunning => _running;
   Isolate? _receiveIsolate;
   ReceivePort? _receivePort;
@@ -118,9 +117,10 @@ class Service {
       if (s == null) {
         continue;
       }
-      if (s == '{"@type":"testInt","value":1}') {
+      // Custom event for closing the receive loop
+      if (s == '{"@type":"error","code":9527,"message":""}') {
         sendPortToMain.send(true);
-        break;
+        return;
       }
       sendPortToMain.send(s);
     }
@@ -143,48 +143,59 @@ class Service {
 
   /// Start receiving messages from native td json client
   Future<void> start() async {
-    if (_starting || _running) {
+    if (_running) {
+      return;
+    }
+    if (_starting) {
       return;
     }
     _starting = true;
-    if (_client.clientId == null || _isLoggedOut) {
+    if (_client.clientId == null) {
       _client.create();
       send({
         "@type": "setLogVerbosityLevel",
         "new_verbosity_level": newVerbosityLevel
       });
-      _isLoggedOut = false;
     }
     await _initIsolate();
     _starting = false;
     _running = true;
   }
 
-  /// Stop receiving messaages from native td json client, use this wisely
+  /// Stop receiving messages from native td json client, use this wisely
   Future<void> stop() async {
-    if (_stopping || !_running) {
+    if (!_running) {
       return;
     }
-    _stopping = true;
+    if (_stopping != null) {
+      return;
+    }
+    _stopping = Completer();
     // Need to wait isolate finishing last receive loop to prevent the error: [Client.cpp:277] Receive is called after Client destroy, or simultaneously from different threads
     // Flows:
     // - send custom event to td native
+    //   - must use `testReturnError` as event, because others like `testSquareInt` can't be send after `authorizationStateClosed`
     // - isolate receive the event
-    // - isolate send spectial type to main
+    // - isolate send special type to main
     // - isolate break the loop
     // - main receive the type
     // - kill isolate
     _client.send({
-      "@type": "testSquareInt",
-      "x": 1
+      "@type": "testReturnError",
+      "error": {
+        // should prevent conflicts with td's code, but there is no code list in official doc, so here's using just a big number.
+        "code": 9527
+      }
     });
+    await _stopping;
+    _killIsolate();
+    _stopping = null;
+    _running = false;
   }
 
   void _onIsolateReceive(dynamic data) {
     if (data is bool) {
-      _killIsolate();
-      _stopping = false;
-      _running = false;
+      _stopping?.complete();
       return;
     }
     String s = data;
@@ -268,8 +279,8 @@ class Service {
         break;
       // To prevent someone send {"@type": "logOut"}
       case 'authorizationStateClosed':
-        _isLoggedOut = true;
         await stop();
+        _client.clientId = null; // force recreate client
         break;
     }
   }
@@ -288,7 +299,7 @@ class Service {
 
   /// Asynchronously send td function
   Future send(Map<String, dynamic> obj) async {
-    // Because we're using `testSquareInt` as a flow signal, it's neccecery adding @extra to distinguish where the event from.
+    // Because we're using `testReturnError` as a flow signal, it's necessary adding @extra to distinguish where the event from.
     int extra;
     if (obj.containsKey('@extra')) {
       extra = obj['@extra'];

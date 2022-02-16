@@ -1,9 +1,9 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_libtdjson (0.2.1)
+  - flutter_libtdjson (0.2.2)
   - libtdjson (0.0.1):
     - Flutter
-    - flutter_libtdjson (= 0.2.1)
+    - flutter_libtdjson (= 0.2.2)
   - path_provider_ios (0.0.1):
     - Flutter
   - "permission_handler (5.1.0+2)":
@@ -31,8 +31,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  flutter_libtdjson: feb4036eee6f6930aa42a75d624eeac7fb4221d9
-  libtdjson: 59f52c13b0a7331b4792dee5e332c2eb56b07504
+  flutter_libtdjson: 12ff08bbe6832d8c9eb89b17cf106fc06e887eff
+  libtdjson: 5065f450b7fd9505e4863a6357437d5460db10ff
   path_provider_ios: 7d7ce634493af4477d156294792024ec3485acd5
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
 

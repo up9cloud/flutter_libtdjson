@@ -15,7 +15,7 @@ Demonstrates how to use the libtdjson plugin.
     ```
 
 - Follow the plugin [installation](https://github.com/up9cloud/flutter_libtdjson)
-- `flutter devices`
+- To get the device id by running `flutter devices`
 - `flutter run -d <device id>`, e.q. flutter run -d emulator-5554
 
 ## Dev memo
@@ -67,7 +67,7 @@ mv ./_tmp/example/macos .
 rm -fr _tmp
 ```
 
-Add this part to `./macos/Runner/DebugProfile.entitlements`, see [setup entitlements](https://flutter.dev/desktop#setting-up-entitlements)
+Add following part to `./macos/Runner/DebugProfile.entitlements`, see [setup entitlements](https://flutter.dev/desktop#setting-up-entitlements)
 
 ```xml
 <dict>

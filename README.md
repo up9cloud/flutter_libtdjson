@@ -8,6 +8,7 @@ A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-fr
 
 | package | td                                   |
 | ------- | ------------------------------------ |
+| 0.1.4   | 1.8.1 (Android, iOS, macOS)          |
 | 0.1.3   | 1.7.9 (Android, iOS, macOS)          |
 | 0.1.2   | 1.7.0 (Android), latest (iOS, macOS) |
 
@@ -37,7 +38,7 @@ Make sure you are using supported one
 
   ```yml
   dependencies:
-    libtdjson: ^0.1.3
+    libtdjson: ^0.1.4
   ```
 
 - If you want to build android, you have to add envs for github maven, see `./android/build.gradle`
@@ -67,14 +68,39 @@ Make sure you are using supported one
 
 ## Dev memo
 
-> Bump tdlib version
+> Bump TDLib version
 
 - Bump the td version of [android-libtdjson](https://github.com/up9cloud/android-libtdjson)
+- Bump the android dependency version in `./android/build.gradle`
+- Run `./example` for android
+
+  ```bash
+  cd ./example
+  flutter run -d emulator-5554
+  ```
+
 - Bump the td version of [ios-libtdjson](https://github.com/up9cloud/ios-libtdjson)
-- Bump the android dependency version in `./android/app/build.gradle`
-- Bump the ios dependency version in `./ios/libtdjson.podspec`
 - Bump the macos dependency version in `./macos/libtdjson.podspec`
-- Run `./example` for ios, android, macos
+- Run `./example` for macos
+
+  ```bash
+  cd ./example/macos
+  pod update flutter_libtdjson
+  cd ..
+  flutter run -d macos`
+  ```
+
+- Bump the ios dependency version in `./ios/libtdjson.podspec`
+- Run `./example` for ios
+
+  ```bash
+  cd ./example/ios
+  pod update flutter_libtdjson
+  cd ..
+  flutter run -d "iPhone 13"
+  ```
+
 - Bump the package version in `./pubspec.yaml`
+- Add changelog for new version in `./CHANGELOG.md`
 - Bump version info in `./README.md`
-- Commit and push
+- Commit, add tag and push

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.1.4
+
+* Bump TDLib version to 1.8.1
+* perf(Service): Close the receiving loop as soon as possible after calling stop
+
 ## 0.1.3
 
 * Bump the TD Lib version to v1.7.9

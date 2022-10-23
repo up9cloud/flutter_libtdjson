@@ -16,7 +16,7 @@ class Service {
   /// Timeout (second) for event loop of `receive` stream. (td receive)
   late double timeout;
 
-  /// The maximun random value (0 ~ max) for td function @extra
+  /// The maximum random value (0 ~ maxExtra) for td function @extra
   late int maxExtra;
 
   /// Initial tdlibParameters for td function [setTdlibParameters](https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1set_tdlib_parameters.html)
@@ -31,7 +31,7 @@ class Service {
   /// The event fired before sending object to td json client (via function send, sendSync)
   void Function(Map<String, dynamic>)? beforeSend;
 
-  /// The event fired after receiving object from td json client (via receive stream loop, including td error object)
+  /// The event fired after service handling receiving object from td json client (via receive stream loop, including td error object)
   void Function(Map<String, dynamic>)? afterReceive;
 
   /// The event fired before sending object to td json client (via function execute)
@@ -43,7 +43,7 @@ class Service {
   /// The event fired after receiving Error (parsed from td json error object, {"@type": "error", ...})
   void Function(Error)? onReceiveError;
 
-  /// dart Stream(onError) for recevie stream loop
+  /// dart Stream(onError) for receive stream loop
   void Function(dynamic)? onStreamError;
 
   Service(
@@ -51,11 +51,11 @@ class Service {
       // Parameters for native lib loader
       String? dir,
       String? file,
-      // Parameters for handleing client
+      // Parameters for handling client
       this.timeout = 10,
       this.maxExtra = 10000000,
 
-      /// start the recevie stream loop, default is true, set it to false if you want start it later
+      /// start the receive stream loop, default is true, set it to false if you want start it later
       start = true,
       // Parameters for td api
       required Map<String, dynamic> tdlibParameters,
@@ -173,17 +173,16 @@ class Service {
     _stopping = Completer();
     // Need to wait isolate finishing last receive loop to prevent the error: [Client.cpp:277] Receive is called after Client destroy, or simultaneously from different threads
     // Flows:
-    // - send custom event to td native
-    //   - must use `testReturnError` as event, because others like `testSquareInt` can't be send after `authorizationStateClosed`
+    // - main send custom event to td native, must use `testReturnError` as event, because others like `testSquareInt` can't be send after `authorizationStateClosed`
     // - isolate receive the event
     // - isolate send special type to main
     // - isolate break the loop
     // - main receive the type
-    // - kill isolate
+    // - main kill isolate
     _client.send({
       "@type": "testReturnError",
       "error": {
-        // should prevent conflicts with td's code, but there is no code list in official doc, so here's using just a big number.
+        // should prevent conflicts with td's error code, but there is no code list in official doc, so here's using just a big number.
         "code": 9527
       }
     });
@@ -297,9 +296,7 @@ class Service {
     return extra;
   }
 
-  /// Asynchronously send td function
-  Future send(Map<String, dynamic> obj) async {
-    // Because we're using `testReturnError` as a flow signal, it's necessary adding @extra to distinguish where the event from.
+  Completer<Map<String, dynamic>> _send(Map<String, dynamic> obj) {
     int extra;
     if (obj.containsKey('@extra')) {
       extra = obj['@extra'];
@@ -313,6 +310,12 @@ class Service {
       beforeSend!(obj);
     }
     _client.send(obj);
+    return completer;
+  }
+
+  /// Asynchronously send td function
+  Future send(Map<String, dynamic> obj) async {
+    _send(obj);
     return Future.value();
   }
 
@@ -320,19 +323,7 @@ class Service {
   /// This is handled by dart side service, not by native td execute function
   /// Because td client doesn't allow some functions executing synchronously
   Future<Map<String, dynamic>> sendSync(Map<String, dynamic> obj) {
-    int extra;
-    if (obj.containsKey('@extra')) {
-      extra = obj['@extra'];
-    } else {
-      extra = _generateUniqueExtra();
-      obj['@extra'] = extra;
-    }
-    final completer = Completer<Map<String, dynamic>>();
-    _callbacks[extra] = completer;
-    if (beforeSend != null) {
-      beforeSend!(obj);
-    }
-    _client.send(obj);
+    final completer = _send(obj);
     return completer.future;
   }
 

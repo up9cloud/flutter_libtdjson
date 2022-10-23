@@ -15,6 +15,9 @@ import './mod.dart' show NavigationService, LogService;
 class TelegramService extends ChangeNotifier {
   Service? _service;
   Function(dynamic s) _log = LogService.build('TelegramService');
+  Function(dynamic) _logWrapper(String key, [void Function(dynamic obj)? fn]) {
+    return LogService.build('TelegramService:$key', fn);
+  }
 
   TelegramService() {
     _init();
@@ -41,11 +44,11 @@ class TelegramService extends ChangeNotifier {
         'files_directory': tempDir.path,
         'enable_storage_optimizer': true,
       },
-      beforeSend: _logWapper('beforeSend'),
+      beforeSend: _logWrapper('beforeSend'),
       afterReceive: _afterReceive,
-      beforeExecute: _logWapper('beforeExecute'),
-      afterExecute: _logWapper('afterExecute'),
-      onReceiveError: _logWapper('onReceiveError', (e) {
+      beforeExecute: _logWrapper('beforeExecute'),
+      afterExecute: _logWrapper('afterExecute'),
+      onReceiveError: _logWrapper('onReceiveError', (e) {
         // debugger(when: true);
       }),
     );
@@ -64,14 +67,10 @@ class TelegramService extends ChangeNotifier {
     }
   }
 
-  Function(dynamic) _logWapper(String key, [void Function(dynamic obj)? fn]) {
-    return LogService.build('TelegramService:$key', fn);
-  }
-
   _afterReceive(Map<String, dynamic> event) {
     switch (event['@type']) {
       case 'updateAuthorizationState':
-        _logWapper("_afterReceive")(event);
+        _logWrapper("_afterReceive")(event);
         _handleAuth(event['authorization_state']);
         break;
     }

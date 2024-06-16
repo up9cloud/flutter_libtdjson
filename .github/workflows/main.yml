@@ -13,8 +13,8 @@ jobs:
       - uses: k-paxian/dart-package-publisher@v1.6
         id: flutter_publish
         with:
-          accessToken: ${{ secrets.FLUTTER_PUB_ACCESS_TOKEN }}
-          refreshToken: ${{ secrets.FLUTTER_PUB_REFRESH_TOKEN }}
+          accessToken: ${{ secrets.DART_PUB_ACCESS_TOKEN }}
+          refreshToken: ${{ secrets.DART_PUB_REFRESH_TOKEN }}
           skipTests: true
           flutter: true
       - id: set_status

@@ -112,6 +112,17 @@ Make sure you are using supported one
 - Push with tags (`git push && git push --tags`)
 - Wait for CI task
 
+### Manually publish
+
+- https://dart.dev/tools/pub/publishing
+
+```bash
+dart pub publish
+
+# credentials file on macos
+cat ~/Library/Application\ Support/dart/pub-credentials.json
+```
+
 ## TODO
 
 - [ ] ⛔ is about `iOS with dylib`. There are .dylib files in build/ios/Debug-iphonesimulator/XCFrameworkIntermediates, but still...

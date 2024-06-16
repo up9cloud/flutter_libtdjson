@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.0
+
+* Bump TDLib version to 1.8.30
+
 ## 0.1.4
 
 * Bump TDLib version to 1.8.1

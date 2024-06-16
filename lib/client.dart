@@ -16,6 +16,21 @@ class NativeClient {
   late final DynamicLibrary libtdjson;
 
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
+  late final defDart.td_create_client_id td_create_client_id;
+
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
+  late final defDart.td_send td_send;
+
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
+  late final defDart.td_receive td_receive;
+
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
+  late final defDart.td_execute td_execute;
+
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
+  late final defDart.td_set_log_message_callback td_set_log_message_callback;
+
+  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_create td_json_client_create;
 
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
@@ -29,18 +44,6 @@ class NativeClient {
 
   /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
   late final defDart.td_json_client_destroy td_json_client_destroy;
-
-  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
-  late final defDart.td_create_client_id td_create_client_id;
-
-  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
-  late final defDart.td_send td_send;
-
-  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
-  late final defDart.td_receive td_receive;
-
-  /// FFI binding function, see TDLib doc for [td_json_client](https://core.telegram.org/tdlib/docs/td__json__client_8h.html)
-  late final defDart.td_execute td_execute;
 
   NativeClient({String? dir, String? file}) {
     _load(dir: dir, file: file);
@@ -65,6 +68,21 @@ class NativeClient {
   // https://github.com/tdlib/td/pull/708/commits/237060abd4c205768153180e9f814298d1aa9d49
   _load({String? dir, String? file}) {
     libtdjson = loadLibrary(dir: dir, file: file);
+    td_create_client_id = libtdjson
+        .lookup<NativeFunction<def.td_create_client_id>>('td_create_client_id')
+        .asFunction();
+    td_send =
+        libtdjson.lookup<NativeFunction<def.td_send>>('td_send').asFunction();
+    td_receive = libtdjson
+        .lookup<NativeFunction<def.td_receive>>('td_receive')
+        .asFunction();
+    td_execute = libtdjson
+        .lookup<NativeFunction<def.td_execute>>('td_execute')
+        .asFunction();
+    td_set_log_message_callback = libtdjson
+        .lookup<NativeFunction<def.td_set_log_message_callback>>(
+            'td_set_log_message_callback')
+        .asFunction();
     td_json_client_create = libtdjson
         .lookup<NativeFunction<def.td_json_client_create>>(
             'td_json_client_create')
@@ -84,17 +102,6 @@ class NativeClient {
         .lookup<NativeFunction<def.td_json_client_destroy>>(
             'td_json_client_destroy')
         .asFunction();
-    td_create_client_id = libtdjson
-        .lookup<NativeFunction<def.td_create_client_id>>('td_create_client_id')
-        .asFunction();
-    td_send =
-        libtdjson.lookup<NativeFunction<def.td_send>>('td_send').asFunction();
-    td_receive = libtdjson
-        .lookup<NativeFunction<def.td_receive>>('td_receive')
-        .asFunction();
-    td_execute = libtdjson
-        .lookup<NativeFunction<def.td_execute>>('td_execute')
-        .asFunction();
   }
 }
 
@@ -106,32 +113,6 @@ class RawClient {
 
   RawClient({String? dir, String? file}) {
     _nativeClient = NativeClient(dir: dir, file: file);
-  }
-
-  int td_json_client_create() {
-    return _nativeClient.td_json_client_create().address;
-  }
-
-  td_json_client_send(int clientId, String request) {
-    _nativeClient.td_json_client_send(
-        Pointer.fromAddress(clientId), request.toNativeUtf8());
-  }
-
-  /// It will return null if timed out
-  String? td_json_client_receive(int clientId, double timeout) {
-    Pointer<Utf8> raw = _nativeClient.td_json_client_receive(
-        Pointer.fromAddress(clientId), timeout);
-    // Native client may return nullptr (0x0)
-    if (raw.address == nullptr.address) {
-      return null;
-    }
-    return raw.toDartString();
-  }
-
-  String td_json_client_execute(int clientId, String request) {
-    Pointer<Utf8> raw = _nativeClient.td_json_client_execute(
-        Pointer.fromAddress(clientId), request.toNativeUtf8());
-    return raw.toDartString();
   }
 
   td_json_client_destroy(int clientId) {
@@ -157,6 +138,38 @@ class RawClient {
 
   String td_execute(String request) {
     Pointer<Utf8> raw = _nativeClient.td_execute(request.toNativeUtf8());
+    return raw.toDartString();
+  }
+
+  // TODO: Pointer<Utf8> to String
+  void td_set_log_message_callback(
+      int max_verbosity_level, def.td_log_message_callback_ptr callback) {
+    _nativeClient.td_set_log_message_callback(max_verbosity_level, callback);
+  }
+
+  int td_json_client_create() {
+    return _nativeClient.td_json_client_create().address;
+  }
+
+  td_json_client_send(int clientId, String request) {
+    _nativeClient.td_json_client_send(
+        Pointer.fromAddress(clientId), request.toNativeUtf8());
+  }
+
+  /// It will return null if timed out
+  String? td_json_client_receive(int clientId, double timeout) {
+    Pointer<Utf8> raw = _nativeClient.td_json_client_receive(
+        Pointer.fromAddress(clientId), timeout);
+    // Native client may return nullptr (0x0)
+    if (raw.address == nullptr.address) {
+      return null;
+    }
+    return raw.toDartString();
+  }
+
+  String td_json_client_execute(int clientId, String request) {
+    Pointer<Utf8> raw = _nativeClient.td_json_client_execute(
+        Pointer.fromAddress(clientId), request.toNativeUtf8());
     return raw.toDartString();
   }
 }
@@ -198,5 +211,12 @@ class Client {
   Map<String, dynamic> execute(Map<String, dynamic> obj) {
     String s = _rawClient.td_json_client_execute(clientId!, json.encode(obj));
     return json.decode(s);
+  }
+
+  /// Sets the callback called from internal TDLib log. Default the callback is not set.
+  void set_log_message_callback(int max_verbosity_level,
+      NativeCallable<def.td_log_message_callback> callback) {
+    _rawClient.td_set_log_message_callback(
+        max_verbosity_level, callback.nativeFunction);
   }
 }

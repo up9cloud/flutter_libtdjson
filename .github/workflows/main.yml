@@ -9,8 +9,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: k-paxian/dart-package-publisher@v1.3
+      - uses: actions/checkout@v4
+      - uses: k-paxian/dart-package-publisher@v1.6
         id: flutter_publish
         with:
           accessToken: ${{ secrets.FLUTTER_PUB_ACCESS_TOKEN }}

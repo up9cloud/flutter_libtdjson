@@ -3,99 +3,43 @@ import 'dart:convert' show json;
 import 'dart:math' show Random;
 import 'dart:io' show Platform;
 import 'dart:isolate';
+import 'dart:ffi';
 
 import './client.dart' show Client, RawClient;
 import './error.dart' show Error;
+import './typedef.dart' as def;
 
-class Service {
-  String? _dir;
-  String? _file;
+/// The raw client only handles the stream loop for td receive function
+class RawService {
+  final String? dir;
+  final String? file;
   late Client _client;
-  Map _callbacks = <int, Completer>{};
 
-  /// Timeout (second) for event loop of `receive` stream. (td receive)
+  /// Timeout (second) for event loop of `receive` stream. (td receive), it only works when calling the start fn
   late double timeout;
 
-  /// The maximum random value (0 ~ maxExtra) for td function @extra
-  late int maxExtra;
-
-  /// Initial tdlibParameters for td function [setTdlibParameters](https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1set_tdlib_parameters.html)
-  late Map<String, dynamic> tdlibParameters;
-
   /// Initial new_verbosity_level for td function [setLogVerbosityLevel](https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1set_log_verbosity_level.html)
-  late int newVerbosityLevel;
-
-  /// Initial encryption_key for td function [checkDatabaseEncryptionKey](https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1check_database_encryption_key.html) or new_encryption_key for [setDatabaseEncryptionKey](https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1set_database_encryption_key.html)
-  late String encryptionKey;
-
-  /// The event fired before sending object to td json client (via function send, sendSync)
-  void Function(Map<String, dynamic>)? beforeSend;
-
-  /// The event fired after service handling receiving object from td json client (via receive stream loop, including td error object)
-  void Function(Map<String, dynamic>)? afterReceive;
-
-  /// The event fired before sending object to td json client (via function execute)
-  void Function(Map<String, dynamic>)? beforeExecute;
-
-  /// The event fired after receiving result object from td json client (via function execute)
-  void Function(Map<String, dynamic>)? afterExecute;
-
-  /// The event fired after receiving Error (parsed from td json error object, {"@type": "error", ...})
-  void Function(Error)? onReceiveError;
+  int? newVerbosityLevel;
 
   /// dart Stream(onError) for receive stream loop
   void Function(dynamic)? onStreamError;
 
-  Service(
-      {
-      // Parameters for native lib loader
-      String? dir,
-      String? file,
-      // Parameters for handling client
-      this.timeout = 10,
-      this.maxExtra = 10000000,
+  /// The event fired after service handling receiving `raw` string result from td json client (via receive stream loop)
+  void Function(String)? onReceive;
 
-      /// start the receive stream loop, default is true, set it to false if you want start it later
-      start = true,
-      // Parameters for td api
-      required Map<String, dynamic> tdlibParameters,
-      this.encryptionKey = "",
-      this.newVerbosityLevel = 1,
-      // Event handlers
-      this.beforeSend,
-      this.afterReceive,
-      this.beforeExecute,
-      this.afterExecute,
-      this.onReceiveError,
-      this.onStreamError}) {
-    // Check those 5 required parameters before loading json client
-    if (!tdlibParameters.containsKey('api_id')) {
-      throw ArgumentError("tdlibParameters['api_id'] must be set");
-    }
-    if (!tdlibParameters.containsKey('api_hash')) {
-      throw ArgumentError("tdlibParameters['api_hash'] must be set");
-    }
-    if (!tdlibParameters.containsKey('system_language_code')) {
-      tdlibParameters['system_language_code'] = Platform.localeName;
-    }
-    if (!tdlibParameters.containsKey('application_version')) {
-      tdlibParameters['application_version'] = "0.0.1";
-    }
-    if (!tdlibParameters.containsKey('device_model')) {
-      throw ArgumentError("tdlibParameters['device_model'] must be set");
-    }
-    tdlibParameters['@type'] = 'tdlibParameters';
-    this.tdlibParameters = tdlibParameters;
-    if (maxExtra < 10000) {
-      throw ArgumentError(
-          "To prevent infinity generating @extra, don't set maxExtra less than 10000");
-    }
-    _dir = dir;
-    _file = file;
-    _client = Client(dir: _dir, file: _file);
-    if (start) {
-      this.start();
-    }
+  RawService({
+    // Parameters for native lib loader
+    this.dir,
+    this.file,
+    // Parameters for handling client
+    this.timeout = 30,
+    // Parameters for td api
+    int? this.newVerbosityLevel,
+    // Event handlers
+    this.onStreamError,
+    this.onReceive,
+  }) {
+    _client = Client(dir: dir, file: file);
   }
 
   bool _starting = false;
@@ -126,11 +70,28 @@ class Service {
     }
   }
 
+  void _onReceiveFromIsolate(dynamic data) {
+    if (data is bool) {
+      _stopping?.complete();
+      return;
+    }
+    if (onReceive != null) {
+      onReceive!(data);
+    }
+  }
+
+  void _onReceiveErrorFromIsolate(dynamic e) {
+    if (onStreamError != null) {
+      onStreamError!(e);
+    }
+  }
+
   Future<void> _initIsolate() async {
     _receivePort = ReceivePort();
-    _receivePort!.listen(_onIsolateReceive, onError: _onReceiveError);
+    _receivePort!
+        .listen(_onReceiveFromIsolate, onError: _onReceiveErrorFromIsolate);
     _receiveIsolate = await Isolate.spawn(_receive,
-        [_receivePort!.sendPort, _dir, _file, _client.clientId, timeout],
+        [_receivePort!.sendPort, dir, file, _client.clientId, timeout],
         debugName: "isolated receive");
   }
 
@@ -152,7 +113,9 @@ class Service {
     _starting = true;
     if (_client.clientId == null) {
       _client.create();
-      send({
+    }
+    if (newVerbosityLevel != null) {
+      _client.send({
         "@type": "setLogVerbosityLevel",
         "new_verbosity_level": newVerbosityLevel
       });
@@ -191,18 +154,97 @@ class Service {
     _stopping = null;
     _running = false;
   }
+}
 
-  void _onIsolateReceive(dynamic data) {
+class Service extends RawService {
+  Map _callbacks = <int, Completer>{};
+
+  /// The maximum random value (0 ~ maxExtra) for td function @extra
+  late int maxExtra;
+
+  /// Initial tdlibParameters for td function [setTdlibParameters](https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1set_tdlib_parameters.html)
+  late Map<String, dynamic> tdlibParameters;
+
+  /// The event fired after receiving Error, the error parsed from td json raw string result: {"@type": "error", ...}
+  void Function(Error)? onReceiveError;
+
+  /// The event fired after service handling receiving td object, including td error object
+  void Function(Map<String, dynamic>)? afterReceive;
+
+  /// The event fired before sending object to td json client (via function send, sendSync)
+  void Function(Map<String, dynamic>)? beforeSend;
+
+  /// The event fired before sending object to td json client (via function execute)
+  void Function(Map<String, dynamic>)? beforeExecute;
+
+  /// The event fired after receiving result object from td json client (via function execute)
+  void Function(Map<String, dynamic>)? afterExecute;
+
+  Service({
+    // Parameters for native lib loader
+    super.dir,
+    super.file,
+    // Parameters for handling client
+    super.timeout = 10,
+    this.maxExtra = 10000000,
+    // Parameters for td api
+    super.newVerbosityLevel,
+    required Map<String, dynamic> tdlibParameters,
+
+    // Event handlers
+    super.onStreamError,
+    super.onReceive,
+    this.onReceiveError,
+    this.afterReceive,
+    this.beforeSend,
+    this.beforeExecute,
+    this.afterExecute,
+
+    /// start the receive stream loop, default is true, set it to false if you want start it later
+    start = true,
+  }) {
+    // Check those 5 required parameters before loading json client
+    if (!tdlibParameters.containsKey('api_id')) {
+      throw ArgumentError("tdlibParameters['api_id'] must be set");
+    }
+    if (!tdlibParameters.containsKey('api_hash')) {
+      throw ArgumentError("tdlibParameters['api_hash'] must be set");
+    }
+    if (!tdlibParameters.containsKey('system_language_code')) {
+      tdlibParameters['system_language_code'] = Platform.localeName;
+    }
+    if (!tdlibParameters.containsKey('application_version')) {
+      tdlibParameters['application_version'] = "0.0.1";
+    }
+    if (!tdlibParameters.containsKey('device_model')) {
+      throw ArgumentError("tdlibParameters['device_model'] must be set");
+    }
+    this.tdlibParameters = tdlibParameters;
+    if (maxExtra < 10000) {
+      throw ArgumentError(
+          "To prevent infinity generating @extra, don't set maxExtra less than 10000");
+    }
+    _client = Client(dir: dir, file: file);
+    if (start) {
+      super.start();
+    }
+  }
+
+  @override
+  void _onReceiveFromIsolate(dynamic data) {
     if (data is bool) {
       _stopping?.complete();
       return;
     }
     String s = data;
+    if (onReceive != null) {
+      onReceive!(s);
+    }
     Map<String, dynamic> j = json.decode(s);
-    _onReceive(j);
+    _afterReceive(j);
   }
 
-  void _onReceive(Map<String, dynamic> obj) async {
+  void _afterReceive(Map<String, dynamic> obj) async {
     if (obj['@type'] == 'error') {
       _handleError(Error.fromJson(obj));
     } else {
@@ -210,28 +252,6 @@ class Service {
     }
     if (afterReceive != null) {
       afterReceive!(obj);
-    }
-  }
-
-  _onReceiveError(dynamic e) {
-    if (onStreamError != null) {
-      onStreamError!(e);
-    }
-  }
-
-  Future _handleObject(Map<String, dynamic> obj) async {
-    if (obj['@type'] == "updates") {
-      await Future.wait(
-          (obj['updates'] ?? []).map((update) => _handleEvent(update)));
-    } else {
-      await _handleEvent(obj);
-    }
-    if (obj.containsKey('@extra')) {
-      final int extra = obj['@extra'];
-      if (_callbacks.containsKey(extra)) {
-        Completer fut = _callbacks.remove(extra);
-        fut.complete(obj);
-      }
     }
   }
 
@@ -249,32 +269,35 @@ class Service {
     }
   }
 
-  _handleEvent(Map<String, dynamic> event) async {
-    switch (event['@type']) {
+  Future _handleObject(Map<String, dynamic> obj) async {
+    if (obj['@type'] == "updates") {
+      await Future.wait(
+          (obj['updates'] ?? []).map((update) => _handleEventObject(update)));
+    } else {
+      await _handleEventObject(obj);
+    }
+    if (obj.containsKey('@extra')) {
+      final int extra = obj['@extra'];
+      if (_callbacks.containsKey(extra)) {
+        Completer fut = _callbacks.remove(extra);
+        fut.complete(obj);
+      }
+    }
+  }
+
+  _handleEventObject(Map<String, dynamic> eventObj) async {
+    switch (eventObj['@type']) {
       case 'updateAuthorizationState':
-        await _handleAuth(event['authorization_state']);
+        await _handleAuthObject(eventObj['authorization_state']);
         break;
     }
   }
 
-  _handleAuth(Map<String, dynamic> event) async {
-    switch (event['@type']) {
+  // https://github.com/tdlib/td/blob/master/td/generate/scheme/td_api.tl#L77
+  _handleAuthObject(Map<String, dynamic> authObj) async {
+    switch (authObj['@type']) {
       case 'authorizationStateWaitTdlibParameters':
-        send({'@type': 'setTdlibParameters', 'parameters': tdlibParameters});
-        break;
-      case 'authorizationStateWaitEncryptionKey':
-        final bool isEncrypted = event['is_encrypted'] ?? false;
-        if (isEncrypted) {
-          send({
-            '@type': 'checkDatabaseEncryptionKey',
-            'encryption_key': encryptionKey
-          });
-        } else {
-          send({
-            '@type': 'setDatabaseEncryptionKey',
-            'new_encryption_key': encryptionKey
-          });
-        }
+        send({'@type': 'setTdlibParameters', ...tdlibParameters});
         break;
       // To prevent someone send {"@type": "logOut"}
       case 'authorizationStateClosed':
@@ -343,5 +366,16 @@ class Service {
       return Future.error(e);
     }
     return Future.value(r);
+  }
+
+  NativeCallable<def.td_log_message_callback>? _logMessageCallback = null;
+
+  void setLogMessageCallback(int max_verbosity_level,
+      NativeCallable<def.td_log_message_callback> callback) {
+    if (_logMessageCallback != null) {
+      _logMessageCallback!.close();
+    }
+    _client.set_log_message_callback(max_verbosity_level, callback);
+    _logMessageCallback = callback;
   }
 }

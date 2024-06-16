@@ -15,9 +15,13 @@ A new flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
   s.dependency 'FlutterMacOS'
-  s.dependency 'flutter_libtdjson', '0.2.2'
+  s.dependency 'flutter_libtdjson', '0.4.1'
 
-  s.platform = :osx, '10.11'
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  s.platform = :osx, '10.13'
+  s.osx.pod_target_xcconfig = {
+    'DEFINES_MODULE' => 'YES',
+    'OTHER_LDFLAGS' => '-ltdjson',
+    'LD_RUNPATH_SEARCH_PATHS' => '$(inherited) "${PODS_XCFRAMEWORKS_BUILD_DIR}/flutter_libtdjson"',
+  }
   s.swift_version = '5.0'
 end

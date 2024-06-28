@@ -1,4 +1,4 @@
-package io.github.up9cloud.libtdjson.libtdjson_example;
+package io.github.up9cloud.libtdjson_example;
 
 import io.flutter.embedding.android.FlutterActivity;
 

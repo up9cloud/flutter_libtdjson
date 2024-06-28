@@ -8,6 +8,7 @@ A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-fr
 
 | package | td version                            |
 | ------- | ------------------------------------- |
+| 0.2.1   | 1.8.31 (Android, iOS, macOS)          |
 | 0.2.0   | 1.8.30 (Android, iOS, macOS)          |
 | 0.1.4   | 1.8.1  (Android, iOS, macOS)          |
 | 0.1.3   | 1.7.9  (Android, iOS, macOS)          |
@@ -39,7 +40,7 @@ Make sure you are using supported one
 
   ```yml
   dependencies:
-    libtdjson: ^0.2.0
+    libtdjson: ^0.2.1
   ```
 
 - If you want to build android, you have to add envs for github maven, see `./android/build.gradle`
@@ -100,7 +101,7 @@ Make sure you are using supported one
   cd ..
   flutter run --debug
   # link .dylib to search path, e.q:
-  # ln -s $(pwd)/build/ios/Debug-iphonesimulator/XCFrameworkIntermediates/flutter_libtdjson/libtdjson.dylib ~/Library/Developer/CoreSimulator/Devices/FD63D560-544B-4B18-8F2F-03B093156DE2/data/Containers/Bundle/Application/3D0AD268-62C8-4A78-91AF-C3966EA8027B/Runner.app/Frameworks/libtdjson.dylib
+  # ln -s $(pwd)/build/ios/Debug-iphonesimulator/XCFrameworkIntermediates/flutter_libtdjson/libtdjson.dylib ~/Library/Developer/CoreSimulator/Devices/FD63D560-544B-4B18-8F2F-03B093156DE2/data/Containers/Bundle/Application/004B7B3D-4665-4217-A9C7-2D2193107E80/Runner.app/Frameworks/libtdjson.dylib
   # Reload with `R`
   ```
 
@@ -108,7 +109,7 @@ Make sure you are using supported one
 - Add changelog for new version in `./CHANGELOG.md`
 - Bump version info in `./README.md`
 - Git commit (message example: `bump td to vx.x.x`)
-- Git add tag (`git tag vx.x.x`, the tag version should be same as the version in pubspec.yaml)
+- Git add tag (`git tag v?.?.?`, the tag version should be same as the version in pubspec.yaml)
 - Push with tags (`git push && git push --tags`)
 - Wait for CI task
 

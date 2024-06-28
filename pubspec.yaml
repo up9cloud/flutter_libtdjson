@@ -1,13 +1,13 @@
 name: libtdjson
 description: A flutter plugin for TDLib JSON interface, ffi binding.
-version: 0.2.0
+version: 0.2.1
 homepage: https://github.com/up9cloud/flutter_libtdjson
 repository: https://github.com/up9cloud/flutter_libtdjson
 issue_tracker: https://github.com/up9cloud/flutter_libtdjson/issues
 
 environment:
-  sdk: ">=3.1.0 <4.0.0"
-  flutter: ">=1.20.0"
+  sdk: '>=3.4.3 <4.0.0'
+  flutter: '>=3.3.0'
 
 dependencies:
   flutter:
@@ -20,6 +20,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

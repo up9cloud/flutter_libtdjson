@@ -1,15 +1,15 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_libtdjson (0.4.1)
+  - flutter_libtdjson (0.4.2)
   - libtdjson (0.0.1):
     - Flutter
-    - flutter_libtdjson (= 0.4.1)
+    - flutter_libtdjson (= 0.4.2)
   - package_info_plus (0.4.5):
     - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - permission_handler_apple (9.1.1):
+  - permission_handler_apple (9.3.0):
     - Flutter
 
 DEPENDENCIES:
@@ -37,11 +37,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_libtdjson: 731f3cc7b4b5e17c91a9032001e32fff2bfdea1b
-  libtdjson: a7c78ca7ed957cafd19a1f37b3241fe0d90aa616
-  package_info_plus: 6c92f08e1f853dc01228d6f553146438dafcd14e
+  flutter_libtdjson: cabe35282957e186b80b6cdaaea19a712b6d843f
+  libtdjson: 63b9b6266d75e3df290f43e475f572ad70b68a1d
+  package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
-  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
 
 PODFILE CHECKSUM: 7096d69c085921256031c0b77f50e3baf9b14e24
 

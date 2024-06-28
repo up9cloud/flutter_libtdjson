@@ -23,7 +23,7 @@ Demonstrates how to use the libtdjson plugin.
 ### Regenerate ./android
 
 ```bash
-flutter create -a java --template plugin --platforms android --project-name libtdjson --org io.github.up9cloud.libtdjson _tmp
+flutter create -a java --template plugin --platforms android --project-name libtdjson --org io.github.up9cloud _tmp
 rm -fr android
 mv ./_tmp/example/android .
 rm -fr _tmp

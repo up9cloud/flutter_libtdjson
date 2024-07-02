@@ -1,5 +1,5 @@
 name: libtdjson
-description: A flutter plugin for TDLib JSON interface, ffi binding.
+description: A flutter plugin for TDLib (Telegram Database library) JSON interface, ffi binding.
 version: 0.2.1
 homepage: https://github.com/up9cloud/flutter_libtdjson
 repository: https://github.com/up9cloud/flutter_libtdjson

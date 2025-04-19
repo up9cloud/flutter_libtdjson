@@ -17,6 +17,7 @@ Demonstrates how to use the libtdjson plugin.
 - Follow the plugin [installation](https://github.com/up9cloud/flutter_libtdjson)
 - To get the device id by running `flutter devices`
 - `flutter run -d <device id>`, e.q. flutter run -d emulator-5554
+  - if the target device not exist, launch the emulator: `flutter emulators`, `flutter emulators --launch <id>`
 
 ## Dev memo
 
@@ -27,13 +28,10 @@ flutter create -a java --template plugin --platforms android --project-name libt
 rm -fr android
 mv ./_tmp/example/android .
 rm -fr _tmp
+# remember add the permission back to file `./android/app/src/main/AndroidManifest.xml`
 ```
 
 ### Run android
-
-```txt
-
-```
 
 ```bash
 flutter run -d emulator-5554

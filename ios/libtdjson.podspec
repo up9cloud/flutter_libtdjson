@@ -15,7 +15,7 @@ A new flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'flutter_libtdjson', '0.4.2'
+  s.dependency 'flutter_libtdjson', '0.4.3'
   s.platform = :ios, '9.0'
 
   s.ios.pod_target_xcconfig = {

@@ -12,6 +12,7 @@ A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-fr
 
 | package | td version                            |
 | ------- | ------------------------------------- |
+| 0.2.2   | 1.8.47 (Android, iOS, macOS)          |
 | 0.2.1   | 1.8.31 (Android, iOS, macOS)          |
 | 0.2.0   | 1.8.30 (Android, iOS, macOS)          |
 | 0.1.4   | 1.8.1  (Android, iOS, macOS)          |
@@ -38,13 +39,15 @@ Make sure you are using supported one
 |                  | x86_64       | ✅   |
 |                  | arm64 (M1)   | ✅   |
 
+⛔ This is related to dylib. You need to have a basic understanding of how to import a dylib. For publishing, you must build a static library instead.
+
 ## Installation
 
 - Update `pubspec.yaml`:
 
   ```yml
   dependencies:
-    libtdjson: ^0.2.1
+    libtdjson: ^0.2.2
   ```
 
 - If you want to build android, you have to add envs for github maven, see `./android/build.gradle`
@@ -77,7 +80,7 @@ Make sure you are using supported one
 ### Bump TDLib version
 
 - Bump the td version of [android-libtdjson](https://github.com/up9cloud/android-libtdjson)
-- Bump the android dependency version in `./android/build.gradle`
+- Bump the dependency version in `./android/build.gradle`
 - Run `./example` for android
 
   ```bash
@@ -86,26 +89,28 @@ Make sure you are using supported one
   ```
 
 - Bump the td version of [ios-libtdjson](https://github.com/up9cloud/ios-libtdjson)
-- Bump the macos dependency version in `./macos/libtdjson.podspec` (s.dependency)
+- Bump the dependency version in `./macos/libtdjson.podspec` (s.dependency)
 - Run `./example` for macos
 
   ```bash
   cd ./example/macos
-  pod update flutter_libtdjson
+  pod repo remove trunk
+  pod update
   cd ..
   flutter run -d macos
   ```
 
-- Bump the ios dependency version in `./ios/libtdjson.podspec`
+- Bump the dependency version in `./ios/libtdjson.podspec`
 - Run `./example` for ios simulator
 
   ```bash
   cd ./example/ios
-  pod update flutter_libtdjson
+  pod repo remove trunk
+  pod update
   cd ..
   flutter run --debug
   # link .dylib to search path, e.q:
-  # ln -s $(pwd)/build/ios/Debug-iphonesimulator/XCFrameworkIntermediates/flutter_libtdjson/libtdjson.dylib ~/Library/Developer/CoreSimulator/Devices/FD63D560-544B-4B18-8F2F-03B093156DE2/data/Containers/Bundle/Application/004B7B3D-4665-4217-A9C7-2D2193107E80/Runner.app/Frameworks/libtdjson.dylib
+  # ln -s $(pwd)/build/ios/Debug-iphonesimulator/XCFrameworkIntermediates/flutter_libtdjson/libtdjson.dylib ~/Library/Developer/CoreSimulator/Devices/FD63D560-544B-4B18-8F2F-03B093156DE2/data/Containers/Bundle/Application/428541A3-8A6A-4766-9297-2B6AA4465542/Runner.app/Frameworks/libtdjson.dylib
   # Reload with `R`
   ```
 
@@ -127,7 +132,3 @@ dart pub publish
 # credentials file on macos
 cat ~/Library/Application\ Support/dart/pub-credentials.json
 ```
-
-## TODO
-
-- [ ] ⛔ is about `iOS with dylib`. There are .dylib files in build/ios/Debug-iphonesimulator/XCFrameworkIntermediates, but still...

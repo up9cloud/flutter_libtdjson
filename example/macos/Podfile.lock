@@ -1,8 +1,8 @@
 PODS:
-  - flutter_libtdjson (0.4.2)
+  - flutter_libtdjson (0.4.3)
   - FlutterMacOS (1.0.0)
   - libtdjson (0.0.1):
-    - flutter_libtdjson (= 0.4.2)
+    - flutter_libtdjson (= 0.4.3)
     - FlutterMacOS
   - package_info_plus (0.0.1):
     - FlutterMacOS
@@ -31,12 +31,12 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
 
 SPEC CHECKSUMS:
-  flutter_libtdjson: cabe35282957e186b80b6cdaaea19a712b6d843f
+  flutter_libtdjson: 8519ef010af1b5c721b4602e8bffe0fbe479433a
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  libtdjson: ffd302e860696bccdf58d4230ef8ad5cb405d39b
+  libtdjson: 5485dddd2359a5674abb77147d921f308d866aff
   package_info_plus: fa739dd842b393193c5ca93c26798dff6e3d0e0c
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
 
 PODFILE CHECKSUM: eec3430f260cde219af51c43f1bcfccf35ab54d0
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

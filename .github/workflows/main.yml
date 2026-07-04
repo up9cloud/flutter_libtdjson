@@ -1,32 +1,23 @@
 name: Releases
 
-on: 
+on:
   push:
     tags:
-    - '*'
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
+  # https://dart.dev/tools/pub/automated-publishing
   publish:
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
+  notify:
+    needs: publish
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: k-paxian/dart-package-publisher@v1.6
-        id: flutter_publish
-        with:
-          accessToken: ${{ secrets.DART_PUB_ACCESS_TOKEN }}
-          refreshToken: ${{ secrets.DART_PUB_REFRESH_TOKEN }}
-          skipTests: true
-          flutter: true
-      - id: set_status
-        run: |
-          if [ "${{steps.flutter_publish.outputs.success}}" = "true" ]; then
-            echo "::set-output name=status::success"
-          else
-            echo "::set-output name=status::failure"
-          fi
       - uses: up9cloud/action-notify@master
-        if: cancelled() == false
         env:
-          GITHUB_JOB_STATUS: ${{ steps.set_status.outputs.status }}
+          GITHUB_JOB_STATUS: ${{ needs.publish.result }}
           TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
           TELEGRAM_CHAT_ID: ${{secrets.TELEGRAM_CHAT_ID}}

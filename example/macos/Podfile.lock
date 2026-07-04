@@ -1,20 +1,16 @@
 PODS:
-  - flutter_libtdjson (0.4.3)
+  - flutter_libtdjson (1.8.65)
   - FlutterMacOS (1.0.0)
   - libtdjson (0.0.1):
-    - flutter_libtdjson (= 0.4.3)
+    - flutter_libtdjson (= 1.8.65)
     - FlutterMacOS
   - package_info_plus (0.0.1):
-    - FlutterMacOS
-  - path_provider_foundation (0.0.1):
-    - Flutter
     - FlutterMacOS
 
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
   - libtdjson (from `Flutter/ephemeral/.symlinks/plugins/libtdjson/macos`)
   - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
-  - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -27,16 +23,13 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/libtdjson/macos
   package_info_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos
-  path_provider_foundation:
-    :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
 
 SPEC CHECKSUMS:
-  flutter_libtdjson: 8519ef010af1b5c721b4602e8bffe0fbe479433a
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  libtdjson: 5485dddd2359a5674abb77147d921f308d866aff
-  package_info_plus: fa739dd842b393193c5ca93c26798dff6e3d0e0c
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  flutter_libtdjson: 58fbc5a899869c53a43ee1d6d5b62d3e53a0bab2
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
+  libtdjson: 9170f80f44e01b1784fc803a351ab38211bd8a96
+  package_info_plus: a8a591e70e87ce97ce5d21b2594f69cea9e0312f
 
-PODFILE CHECKSUM: eec3430f260cde219af51c43f1bcfccf35ab54d0
+PODFILE CHECKSUM: 8cdf29216ea1ab6b9743188287968d22b4579c1d
 
 COCOAPODS: 1.16.2

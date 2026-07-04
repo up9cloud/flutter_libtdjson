@@ -10,14 +10,15 @@ A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-fr
 
 ## Lib versions
 
-| package | td version                            |
-| ------- | ------------------------------------- |
-| 0.2.2   | 1.8.47 (Android, iOS, macOS)          |
-| 0.2.1   | 1.8.31 (Android, iOS, macOS)          |
-| 0.2.0   | 1.8.30 (Android, iOS, macOS)          |
-| 0.1.4   | 1.8.1  (Android, iOS, macOS)          |
-| 0.1.3   | 1.7.9  (Android, iOS, macOS)          |
-| 0.1.2   | 1.7.0  (Android), latest (iOS, macOS) |
+| package | td version (Android) | td version (iOS) | td version (macOS) |
+| ------- | -------------------- | ---------------- | ------------------ |
+| 0.3.0   | 1.8.65               | 1.8.65           | 1.8.65             |
+| 0.2.2   | 1.8.47               | 1.8.47           | 1.8.47             |
+| 0.2.1   | 1.8.31               | 1.8.31           | 1.8.31             |
+| 0.2.0   | 1.8.30               | 1.8.30           | 1.8.30             |
+| 0.1.4   | 1.8.1                | 1.8.1            | 1.8.1              |
+| 0.1.3   | 1.7.9                | 1.7.9            | 1.7.9              |
+| 0.1.2   | 1.7.0                | latest           | latest             |
 
 ## Supported architectures
 
@@ -31,15 +32,13 @@ Make sure you are using supported one
 |                  | x86_64       | ✅   |
 | iOS              | armv7        | ❌   |
 |                  | armv7s       | ❌   |
-|                  | arm64        | ⛔   |
+|                  | arm64        | ✅   |
 | iOS simulator    | i386         | ❌   |
-|                  | x86_64       | ⛔   |
-|                  | arm64 (M1)   | ⛔   |
+|                  | x86_64       | ✅   |
+|                  | arm64 (M1)   | ✅   |
 | macOS            | i386         | ❌   |
 |                  | x86_64       | ✅   |
 |                  | arm64 (M1)   | ✅   |
-
-⛔ This is related to dylib. You need to have a basic understanding of how to import a dylib. For publishing, you must build a static library instead.
 
 ## Installation
 
@@ -47,7 +46,7 @@ Make sure you are using supported one
 
   ```yml
   dependencies:
-    libtdjson: ^0.2.2
+    libtdjson: ^0.3.0
   ```
 
 - If you want to build android, you have to add envs for github maven, see `./android/build.gradle`
@@ -94,7 +93,10 @@ Make sure you are using supported one
 
   ```bash
   cd ./example/macos
-  pod repo remove trunk
+  rm -rf Pods Podfile.lock
+  pod install --repo-update
+  #pod repo remove trunk
+  pod repo update
   pod update
   cd ..
   flutter run -d macos
@@ -109,9 +111,6 @@ Make sure you are using supported one
   pod update
   cd ..
   flutter run --debug
-  # link .dylib to search path, e.q:
-  # ln -s $(pwd)/build/ios/Debug-iphonesimulator/XCFrameworkIntermediates/flutter_libtdjson/libtdjson.dylib ~/Library/Developer/CoreSimulator/Devices/FD63D560-544B-4B18-8F2F-03B093156DE2/data/Containers/Bundle/Application/428541A3-8A6A-4766-9297-2B6AA4465542/Runner.app/Frameworks/libtdjson.dylib
-  # Reload with `R`
   ```
 
 - Bump the package version in `./pubspec.yaml`

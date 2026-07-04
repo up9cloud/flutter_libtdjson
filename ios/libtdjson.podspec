@@ -15,14 +15,15 @@ A new flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'flutter_libtdjson', '0.4.3'
-  s.platform = :ios, '9.0'
+  s.dependency 'flutter_libtdjson', '1.8.65'
+  s.platform = :ios, '12.0'
 
   s.ios.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    'OTHER_LDFLAGS' => '-l"tdjson"',
-    'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_XCFRAMEWORKS_BUILD_DIR}/flutter_libtdjson"',
-    'LD_RUNPATH_SEARCH_PATHS' => '$(inherited) "${PODS_XCFRAMEWORKS_BUILD_DIR}/flutter_libtdjson"',
+    'OTHER_LDFLAGS' => '$(inherited) -force_load "${PODS_XCFRAMEWORKS_BUILD_DIR}/flutter_libtdjson/libtdjson.a" -lz -lc++',
+    # 'OTHER_LDFLAGS' => '-l"tdjson"',
+    # 'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_XCFRAMEWORKS_BUILD_DIR}/flutter_libtdjson"',
+    # 'LD_RUNPATH_SEARCH_PATHS' => '$(inherited) "${PODS_XCFRAMEWORKS_BUILD_DIR}/flutter_libtdjson"',
   }
   s.swift_version = '5.0'
 end

@@ -51,7 +51,15 @@ class NativeClient {
 
   static DynamicLibrary loadLibrary({String? dir, String? file}) {
     if (file == null) {
-      if (Platform.isMacOS || Platform.isIOS) {
+      if (Platform.isIOS) {
+        // On iOS the library may be linked statically into the app binary,
+        // so try to resolve symbols from the current process first.
+        final process = DynamicLibrary.process();
+        if (process.providesSymbol('td_create_client_id')) {
+          return process;
+        }
+        file = 'libtdjson.dylib';
+      } else if (Platform.isMacOS) {
         file = 'libtdjson.dylib';
       } else if (Platform.isWindows) {
         file = 'tdjson.dll';

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.3.0
+
+* Bump TDLib version to 1.8.65
+* iOS: switch to the static library (`libtdjson.a`), force-loaded into the plugin framework instead of shipping `libtdjson.dylib`
+* iOS: `Client` now resolves TDLib symbols via `DynamicLibrary.process()` first, falling back to `libtdjson.dylib` if not statically linked
+
 ## 0.2.2
 
 * Bump TDLib version to 1.8.47

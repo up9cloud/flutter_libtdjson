@@ -4,7 +4,6 @@
 [![Pub Version](https://img.shields.io/pub/v/libtdjson)](https://pub.dev/packages/libtdjson)
 [![Pub Likes](https://img.shields.io/pub/likes/libtdjson)](https://pub.dev/packages/libtdjson/score)
 [![Pub Points](https://img.shields.io/pub/points/libtdjson)](https://pub.dev/packages/libtdjson/score)
-[![popularity](https://img.shields.io/pub/popularity/libtdjson)](https://pub.dev/packages/libtdjson/score)
 
 A flutter plugin for [TDLib JSON interface](https://github.com/tdlib/td#using-from-other-programming-languages), ffi binding.
 
